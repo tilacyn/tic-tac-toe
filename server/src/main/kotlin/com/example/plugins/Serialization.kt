@@ -5,6 +5,7 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.*
+import io.ktor.server.auth.*
 
 fun Application.configureSerialization() {
     install(ContentNegotiation) {
@@ -19,5 +20,6 @@ fun Application.configureSerialization() {
         allowHeader(HttpHeaders.ContentType)
         anyHost()
     }
+    install(Authentication)
 
 }
