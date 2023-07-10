@@ -1,6 +1,6 @@
-package com.example.routes
+package com.tilacyn.ttt.routes
 
-import com.example.plugins.UserSession
+import com.tilacyn.ttt.plugins.UserSession
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -19,11 +19,6 @@ fun HTML.index() {
     body {
 
         div {
-            id = "user"
-//            +user
-        }
-
-        div {
             id = "root"
         }
 
@@ -39,20 +34,17 @@ fun HTML.board(user: String) {
     body {
         div {
             id = "pageTypeBoard"
-//            +"Board Page"
+            hidden = true
         }
         div {
+            hidden = true
             id = "user"
             +user
         }
         div {
             id = "root"
         }
-        script {
-
-        }
         script(src = "/static/tic-tac-toe-client.js") {}
-//        style(src = "/static/main.css") { }
     }
 }
 

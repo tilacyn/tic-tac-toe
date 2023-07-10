@@ -1,4 +1,4 @@
-package com.example.plugins
+package com.tilacyn.ttt.plugins
 
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*

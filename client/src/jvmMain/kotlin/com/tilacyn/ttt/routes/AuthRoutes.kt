@@ -1,6 +1,6 @@
-package com.example.routes
+package com.tilacyn.ttt.routes
 
-import com.example.plugins.UserSession
+import com.tilacyn.ttt.plugins.UserSession
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.html.*
@@ -38,13 +38,6 @@ fun Route.authRouting() {
         }
     }
 
-    authenticate("auth-session") {
-        get("/hello") {
-            val userSession = call.principal<UserSession>()
-//            call.sessions.set(userSession?.copy(count = userSession.count + 1))
-            call.respondText("Hello, ${userSession?.name}!")
-        }
-    }
 
     get("/logout") {
         call.sessions.clear<UserSession>()

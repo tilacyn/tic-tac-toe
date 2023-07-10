@@ -1,18 +1,15 @@
-package com.example.routes
+package com.tilacyn.ttt.routes
 
 
-import com.example.models.*
-import com.example.plugins.UserSession
-import com.example.store.boardStorage
+import com.tilacyn.ttt.plugins.UserSession
+import com.tilacyn.ttt.store.boardStore
 import dto.Move
 import io.ktor.http.*
-import io.ktor.http.cio.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlin.random.Random
 
 //val charPool : CharRange = ('a'..'z')
 
@@ -27,7 +24,7 @@ fun Route.moveRouting() {
                     status = HttpStatusCode.BadRequest
                 )
                 val board =
-                    boardStorage[id] ?: return@put call.respondText(
+                    boardStore[id] ?: return@put call.respondText(
                         "No board with id $id",
                         status = HttpStatusCode.NotFound
                     )
@@ -44,9 +41,9 @@ fun Route.moveRouting() {
                         status = HttpStatusCode.Forbidden
                     )
                 }
-                return@put call.respond(
-                    HttpStatusCode.OK,
-                    board.toDTO(),
+                return@put call.respondText(
+                    "success",
+                    status = HttpStatusCode.OK,
                 )
             }
         }

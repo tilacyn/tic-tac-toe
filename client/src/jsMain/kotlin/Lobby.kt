@@ -1,25 +1,20 @@
 import csstype.*
 import dto.BoardDTO
 import dto.BoardStatus
-import react.FC
-import react.Props
 import emotion.react.css
 import kotlinx.browser.window
 import model.LobbyModel
-import org.w3c.dom.Window
-import org.w3c.xhr.XMLHttpRequest
 import react.ChildrenBuilder
-import react.dom.html.InputType
-import react.dom.html.ReactHTML
+import react.FC
+import react.Props
 import react.dom.html.ReactHTML.button
 import react.dom.html.ReactHTML.div
-import react.dom.html.ReactHTML.input
 import react.dom.html.ReactHTML.table
 import react.dom.html.ReactHTML.td
 import react.dom.html.ReactHTML.th
 import react.dom.html.ReactHTML.tr
 import react.useState
-import kotlin.browser.window
+import kotlin.js.Date
 
 external interface LobbyProps : Props {
     var lobbyModel: LobbyModel
@@ -31,6 +26,31 @@ val Lobby = FC<LobbyProps> { props ->
     val setter = instance.component2()
     lobbySubscription.setStateSetter(setter)
 
+    header(model)
+    if (model.boardDescriptions.isEmpty()) {
+        noGamesYet()
+    } else {
+        gamesTable(model)
+    }
+}
+
+
+
+fun ChildrenBuilder.noGamesYet() {
+    div {
+        css {
+            margin = Auto.auto
+            marginTop = 100.px
+            fontSize = 40.px
+            fontFamily = FontFamily.fantasy
+            textAlign = TextAlign.center
+        }
+        +"No games yet"
+    }
+}
+
+
+fun ChildrenBuilder.header(model: LobbyModel) {
     div {
         css {
             padding = 35.px
@@ -95,82 +115,69 @@ val Lobby = FC<LobbyProps> { props ->
             height = 2.px
         }
     }
-    if (model.boardDescriptions.isEmpty()) {
-        div {
-            css {
-                margin = Auto.auto
-                marginTop = 100.px
-                fontSize = 40.px
-                fontFamily = FontFamily.fantasy
-            }
-            +"No games yet"
-        }
-    } else {
 
-        table {
-            css {
-                margin = Auto.auto
-                marginTop = 100.px
-            }
-            tr {
-                th {}
-                th {
-                    css {
-                        backgroundColor = rgb(10, 10, 10)
-                        color = rgb(255, 255, 255)
-                        fontSize = 20.px
-                        fontFamily = FontFamily.fantasy
-                    }
-                    +"Status"
-                }
-                th {
-                    css {
-                        backgroundColor = rgb(10, 10, 10)
-                        color = rgb(255, 255, 255)
-                        fontSize = 20.px
-                        fontFamily = FontFamily.fantasy
-                    }
-                    +"Players"
-                }
-                th {
-                    css {
-                        backgroundColor = rgb(10, 10, 10)
-                        color = rgb(255, 255, 255)
-                        fontSize = 20.px
-                        fontFamily = FontFamily.fantasy
-                    }
-                    +"Last move at"
-                }
-            }
-            if (model.boardDescriptions.isEmpty()) {
-                div
-            }
 
-            model.boardDescriptions.forEach { dto ->
-                val players = dto.user2Symbol.keys.joinToString(", ")
-                tr {
-                    css {
-                        height = 80.px
-                        borderRadius = 9.px
-                        borderColor = NamedColor.white
-                        borderWidth = 5.px
-                        backgroundColor = rgb(120, 120, 120)
-
-                    }
-                    joinCell(dto)
-                    statusCell(dto)
-                    playersCell(players)
-                    lastMoveCell(dto)
-                }
-            }
-        }
-    }
 }
 
 
+fun ChildrenBuilder.gamesTableHeader() {
+    tr {
+        th {}
+        th {
+            css {
+                backgroundColor = rgb(10, 10, 10)
+                color = rgb(255, 255, 255)
+                fontSize = 20.px
+                fontFamily = FontFamily.fantasy
+            }
+            +"Status"
+        }
+        th {
+            css {
+                backgroundColor = rgb(10, 10, 10)
+                color = rgb(255, 255, 255)
+                fontSize = 20.px
+                fontFamily = FontFamily.fantasy
+            }
+            +"Players"
+        }
+        th {
+            css {
+                backgroundColor = rgb(10, 10, 10)
+                color = rgb(255, 255, 255)
+                fontSize = 20.px
+                fontFamily = FontFamily.fantasy
+            }
+            +"Last move at"
+        }
+    }
+}
+fun ChildrenBuilder.gamesTable(model: LobbyModel) {
+    table {
+        css {
+            margin = Auto.auto
+            marginTop = 100.px
+        }
+        gamesTableHeader()
 
-fun ChildrenBuilder.gamesTable() {
+        model.boardDescriptions.forEach { dto ->
+            val players = dto.user2Symbol.keys.joinToString(", ")
+            tr {
+                css {
+                    height = 80.px
+                    borderRadius = 9.px
+                    borderColor = NamedColor.white
+                    borderWidth = 5.px
+                    backgroundColor = rgb(150, 150, 150)
 
+                }
+                joinCell(dto)
+                statusCell(dto)
+                playersCell(players)
+                lastMoveCell(dto)
+            }
+        }
+    }
 }
 
 fun ChildrenBuilder.joinCell(dto: BoardDTO) {
@@ -205,13 +212,14 @@ fun ChildrenBuilder.statusCell(dto: BoardDTO) {
             css {
                 fontSize = 15.px
                 fontFamily = FontFamily.fantasy
-                marginRight = 20.px
+                fontWeight = FontWeight.bold
+                marginRight = 10.px
                 color = when (dto.status) {
                     BoardStatus.FINISHED -> {
                         NamedColor.red
                     }
                     else -> {
-                        NamedColor.green
+                        NamedColor.darkgreen
                     }
                 }
             }
@@ -249,8 +257,10 @@ fun ChildrenBuilder.lastMoveCell(dto: BoardDTO) {
 }
 
 fun formatTimestamp(t: String?): String {
-    if (t == null) {
+    if (t == null || t =="null" || t == "") {
         return ""
     }
-    return t
+    val d = Date(t)
+
+    return "${d.getMonth()}-${d.getDate()}   ${d.getHours()}:${d.getMinutes()}"
 }

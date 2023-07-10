@@ -2,28 +2,18 @@ import csstype.*
 import csstype.LineStyle.Companion.solid
 import dto.BoardDTO
 import dto.BoardStatus
-import emotion.css.css
 import emotion.react.css
-import kotlinx.browser.window
 import model.BoardModel
-import model.LobbyModel
-import org.w3c.dom.HTMLTableCellElement
-import org.w3c.dom.Window
-import org.w3c.xhr.XMLHttpRequest
 import react.*
-import react.dom.html.InputType
 import react.dom.html.ReactHTML.div
-import react.dom.html.ReactHTML.input
-import react.dom.html.ReactHTML.p
+import react.dom.html.ReactHTML.span
 import react.dom.html.ReactHTML.table
 import react.dom.html.ReactHTML.td
 import react.dom.html.ReactHTML.tr
-import react.dom.html.TdHTMLAttributes
 
 external interface BoardProps : Props {
     var boardModel: BoardModel
 }
-
 
 
 val Board = FC<BoardProps> { props ->
@@ -33,30 +23,90 @@ val Board = FC<BoardProps> { props ->
     boardSubscription.setStateSetter(setter)
 
     val prompt = createPrompt(model.dto)
-    val moveAllowed: Boolean = model.dto.status == BoardStatus.FINISHED
-            || model.dto.lastMoveUserID == userID
+    val moveAllowed: Boolean = model.dto.status != BoardStatus.FINISHED
+            && model.dto.lastMoveUserID != userID
 
+
+    promptSection(prompt)
+    playersSection(model.dto)
+
+    gameField(model, setter, moveAllowed)
+
+}
+
+fun ChildrenBuilder.promptSection(prompt: String) {
     div {
         css {
             padding = 5.px
-            backgroundColor = rgb(90, 90, 90)
-            color = rgb(180, 180, 180)
-            width = 40.pct
+            backgroundColor = promptBackgroundColor
+            color = promptTextColor
+            width = 500.px
             height = 50.px
             margin = Auto.auto
+            marginTop = 50.px
             textAlign = TextAlign.center
             fontSize = 24.px
             borderRadius = 9.px
+            paddingTop = 10.px
         }
         +prompt
     }
 
-    playersSection(model.dto)
+}
 
+
+fun ChildrenBuilder.playersSection(dto: BoardDTO) {
+    div {
+        css {
+            position = Position.absolute
+            width = 200.px
+            fontSize = 24.px
+            left = 50.px
+            top = 50.px
+        }
+        div {
+            css {
+                color = rgb(30, 30, 30)
+                marginLeft = 25.px
+            }
+            +"Players"
+        }
+        div {
+            css {
+                backgroundColor = promptBackgroundColor
+                color = promptTextColor
+                width = 200.px
+                fontSize = 24.px
+                borderRadius = 9.px
+                marginTop = 25.px
+            }
+            dto.user2Symbol.forEach {
+                div {
+                    css {
+                        paddingLeft = 25.px
+                    }
+
+                    +"${it.key}:"
+                    span {
+                        css {
+                            color = cellColorMap[it.value] ?: NamedColor.white
+                        }
+                        +it.value
+                    }
+                }
+            }
+        }
+    }
+}
+
+val promptTextColor = rgb(220, 220, 220)
+val promptBackgroundColor = rgb(90, 90, 90)
+
+fun ChildrenBuilder.gameField(model: BoardModel, setter: StateSetter<BoardModel>, moveAllowed: Boolean) {
     table {
         css {
             margin = Auto.auto
-            marginTop = 100.px
+            marginTop = 80.px
             backgroundColor = rgb(52, 73, 94)
             color = rgb(255, 255, 255)
             borderStyle = solid
@@ -80,74 +130,47 @@ val Board = FC<BoardProps> { props ->
 
 }
 
-fun ChildrenBuilder.playersSection(dto: BoardDTO) {
-    div {
-        css {
-            position = Position.absolute
-//                padding = 5.px
-            backgroundColor = rgb(90, 90, 90)
-            color = rgb(180, 180, 180)
-            width = 200.px
-//            height = 50.px
-//            margin = Auto.auto
-//            textAlign = TextAlign.center
-            fontSize = 24.px
-            borderRadius = 9.px
-            left = 50.px
-            top = 300.px
-        }
-        div {
-            css {
-//                padding = 5.px
-//                width = 100.px
-                marginLeft = 20.px
-            }
-            +"Players"
-        }
-        dto.user2Symbol.forEach {
-            div {
-                +"${it.key}: ${it.value}"
-            }
-        }
-    }
-}
 
-fun ChildrenBuilder.emptyCell(i: Int, j: Int, board: BoardModel, setter: StateSetter<BoardModel>, moveAllowed: Boolean) {
+fun ChildrenBuilder.emptyCell(
+    i: Int,
+    j: Int,
+    board: BoardModel,
+    setter: StateSetter<BoardModel>,
+    moveAllowed: Boolean
+) {
     return td {
-        onClick = {
-            val newBoard = board.copy()
-            board.move(i, j).then { newModel ->
-                console.log(newModel)
-                console.log(newBoard)
-                console.log("processing promise (then)")
-                setter {
-                    newModel
+        if (moveAllowed) {
+            onClick = {
+                val newBoard = board.copy()
+                board.move(i, j).then { newModel ->
+                    setter {
+                        newModel
+                    }
                 }
             }
         }
         css(boxCss(useHover = moveAllowed))
     }
-
 }
 
 
 val cellColorMap = mapOf(
-    Pair("1", NamedColor.gray),
-    Pair("2", NamedColor.blue),
-    Pair("3", NamedColor.red),
-    Pair("4", NamedColor.green),
-    Pair("5", NamedColor.yellow),
+    Pair("1", NamedColor.lightblue),
+    Pair("2", NamedColor.lightgreen),
+    Pair("3", NamedColor.lightcoral),
+    Pair("4", NamedColor.lightcyan),
+    Pair("5", NamedColor.lightpink),
 )
 
 fun ChildrenBuilder.cell(s: String) {
     val color = cellColorMap[s] ?: NamedColor.white
     return td {
-        css(boxCss(color))
+        css(boxCss(color, false))
         +s
     }
 }
 
-fun boxCss(color1: NamedColor = NamedColor.white, useHover: Boolean = false): PropertiesBuilder.() -> Unit {
+fun boxCss(color1: NamedColor = NamedColor.white, useHover: Boolean): PropertiesBuilder.() -> Unit {
     return {
         margin = Auto.auto
         marginTop = 200.px
@@ -158,9 +181,9 @@ fun boxCss(color1: NamedColor = NamedColor.white, useHover: Boolean = false): Pr
         borderColor = rgb(44, 62, 80)
         borderRadius = 2.px
         fontWeight = FontWeight.bold
-        fontSize = 3.em
-        height = 80.px
-        width = 80.px
+        fontSize = 2.8.em
+        height = 65.px
+        width = 65.px
         justifyContent = JustifyContent.center
         alignItems = AlignItems.center
         textAlign = TextAlign.center
@@ -171,7 +194,6 @@ fun boxCss(color1: NamedColor = NamedColor.white, useHover: Boolean = false): Pr
         }
     }
 }
-
 
 
 fun createPrompt(dto: BoardDTO): String {
