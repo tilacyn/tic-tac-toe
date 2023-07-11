@@ -9,7 +9,6 @@ import io.ktor.server.http.content.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.html.*
-import kotlinx.html.dom.document
 
 
 fun HTML.index() {
@@ -66,7 +65,6 @@ fun Route.pageRoutes() {
             }
         }
     }
-//    resources() {  }
     staticResources("/static", null)
 
 }

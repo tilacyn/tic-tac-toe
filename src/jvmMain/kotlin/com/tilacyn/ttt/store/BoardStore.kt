@@ -18,9 +18,10 @@ class BoardStore(
 ) {
 
     suspend fun changed() = coroutineScope {
+        val message = encodeToString(serializer(), toDTO())
         for (c: Connection in lobbyConnections) {
-            launch(Dispatchers.Default) {
-                c.session.send(encodeToString(serializer(), toDTO()))
+            launch(Dispatchers.IO) {
+                c.session.send(message)
             }
         }
     }
@@ -34,7 +35,7 @@ class BoardStore(
         return ret
     }
 
-    fun addLobbyConnection(c: Connection) {
+    fun addConnection(c: Connection) {
         lobbyConnections.add(c)
     }
 

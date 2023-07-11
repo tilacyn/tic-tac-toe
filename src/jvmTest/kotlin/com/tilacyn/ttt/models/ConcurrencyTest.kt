@@ -6,12 +6,8 @@ import io.ktor.util.collections.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import org.junit.jupiter.api.Test
-import java.lang.Thread.sleep
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.coroutines.coroutineContext
 import kotlin.random.Random
 import kotlin.test.assertEquals
 
@@ -36,7 +32,6 @@ class ConcurrencyTest {
                 }
                 val validationResultsOKCount = AtomicInteger(0)
                 runBlocking {
-                    withContext(coroutineContext) {
                         for (it in usersConcurrent.indices) {
                             val user = usersConcurrent[it]
                             launch(Dispatchers.Default) {
@@ -45,7 +40,6 @@ class ConcurrencyTest {
                                     validationResultsOKCount.incrementAndGet()
                                 }
                             }
-                        }
                     }
                 }
                 println(validationResultsOKCount.get())
@@ -63,14 +57,12 @@ class ConcurrencyTest {
         }
         val m = ConcurrentSet<String>()
         runBlocking {
-            withContext(coroutineContext) {
                 for (it in 1..500) {
                     launch(Dispatchers.Default) {
                         val user = randomString()
                         b.assignNewUser(user)
                         m.add(user)
                     }
-                }
             }
         }
 

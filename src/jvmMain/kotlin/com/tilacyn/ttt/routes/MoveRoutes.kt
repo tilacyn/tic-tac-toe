@@ -10,10 +10,7 @@ import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.coroutines.delay
-import java.util.logging.Logger
 
-//val charPool : CharRange = ('a'..'z')
 
 
 fun Route.moveRouting() {

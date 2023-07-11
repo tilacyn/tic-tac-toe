@@ -65,9 +65,10 @@ class Board(
     }
 
     private suspend fun changed() = coroutineScope {
+        val message = Json.encodeToString(serializer(), toDTO(true))
         for (c: Connection in connections) {
-            launch(Dispatchers.Default) {
-                c.session.send(Json.encodeToString(serializer(), toDTO(true)))
+            launch(Dispatchers.IO) {
+                c.session.send(message)
             }
         }
         launch(Dispatchers.Default) {

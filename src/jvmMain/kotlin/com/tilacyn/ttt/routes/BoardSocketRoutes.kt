@@ -7,9 +7,9 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
+import java.util.logging.Logger
 
 fun Route.configureSockets() {
-//        val connections = Collections.synchronizedSet<Connection?>(LinkedHashSet())
     webSocket("/ws/board/{id?}") {
         val id = call.parameters["id"] ?: return@webSocket call.respondText(
             "Missing id",
@@ -25,37 +25,26 @@ fun Route.configureSockets() {
         try {
             for (frame in incoming) {
                 frame as? Frame.Text ?: continue
-                val receivedText = frame.readText()
-                println("Received: $receivedText")
             }
         } catch (e: Exception) {
-            println(e.localizedMessage)
+            Logger.getLogger(this.javaClass.name).warning(e.localizedMessage)
         } finally {
-            println("Removing $c!")
             board.removeConnection(c)
         }
-
     }
 
 
     webSocket("/ws/board") {
-        println("Connected to lobby!")
-
         val thisConnection = Connection(this)
-        boardStore.addLobbyConnection(thisConnection)
-        println("added connection!")
+        boardStore.addConnection(thisConnection)
         try {
             for (frame in incoming) {
                 frame as? Frame.Text ?: continue
-                val receivedText = frame.readText()
-                println("Received: $receivedText")
             }
         } catch (e: Exception) {
-            println(e.localizedMessage)
+            Logger.getLogger(this.javaClass.name).warning(e.localizedMessage)
         } finally {
-            println("Removing $thisConnection!")
             boardStore.removeConnection(thisConnection)
         }
-
     }
 }
