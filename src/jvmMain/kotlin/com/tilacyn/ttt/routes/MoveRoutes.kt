@@ -11,6 +11,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.delay
+import java.util.logging.Logger
 
 //val charPool : CharRange = ('a'..'z')
 
@@ -19,7 +20,6 @@ fun Route.moveRouting() {
     authenticate("auth-session") {
         route("/v1/move") {
             put("{id?}") {
-                println("move request accepted")
                 val id = call.parameters["id"] ?: return@put call.respondText(
                     "Missing id",
                     status = HttpStatusCode.BadRequest

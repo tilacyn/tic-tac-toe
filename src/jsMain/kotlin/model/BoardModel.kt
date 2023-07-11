@@ -2,12 +2,12 @@ package model
 
 import dto.BoardDTO
 import dto.Move
-import org.w3c.xhr.XMLHttpRequest
-import kotlin.js.Promise
 import kotlinx.serialization.json.Json
 import org.w3c.dom.MessageEvent
 import org.w3c.dom.WebSocket
+import org.w3c.xhr.XMLHttpRequest
 import react.StateSetter
+import kotlin.js.Promise
 
 private fun reqToBoardModel(req: XMLHttpRequest): BoardModel {
     val text = req.responseText

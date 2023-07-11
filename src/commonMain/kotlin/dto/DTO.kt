@@ -1,6 +1,6 @@
 package dto
 
-import kotlinx.serialization.*
+import kotlinx.serialization.Serializable
 
 
 @Serializable
@@ -11,6 +11,7 @@ data class BoardDTO(
     val user2Symbol: Map<String, String>,
     val lastMoveTimestamp: String?,
     val status: BoardStatus,
+    val winner: String,
 )
 
 enum class BoardStatus {

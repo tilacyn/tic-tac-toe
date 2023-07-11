@@ -16,7 +16,6 @@ fun Route.configureSockets() {
             status = HttpStatusCode.BadRequest
         )
         val c = Connection(this)
-        println("Adding connection: $c")
         val board =
             boardStore[id] ?: return@webSocket call.respondText(
                 "No board with id $id",

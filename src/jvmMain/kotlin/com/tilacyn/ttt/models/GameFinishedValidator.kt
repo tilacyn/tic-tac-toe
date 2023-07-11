@@ -4,16 +4,20 @@ import kotlin.math.max
 import kotlin.math.min
 
 
-class GameFinishedValidator(private val array: List<MutableList<String>>) {
-    fun run(): Boolean {
+data class GameResult(var winner: String = "", val finished: Boolean)
+
+class GameFinishedValidator(private val array: List<MutableList<String>>, private val symbol2User: Map<String, String>) {
+    fun run(): GameResult {
         array.forEach {
-            if (fiveInARow(it)) {
-                return true
+            val res = fiveInARow(it)
+            if (res.finished) {
+                return res
             }
         }
         for (i in 0..9) {
-            if (fiveInARow(array.map { it[i] })) {
-                return true
+            val res = fiveInARow(array.map { it[i] })
+            if (res.finished) {
+                return res
             }
         }
 
@@ -21,8 +25,9 @@ class GameFinishedValidator(private val array: List<MutableList<String>>) {
             val list = mutableListOf<String>()
             for (k in max(0, i - 9)..min(i, 9)) {
                 list.add(array[k][i - k])
-                if (fiveInARow(list)) {
-                    return true
+                val res = fiveInARow(list)
+                if (res.finished) {
+                    return res
                 }
             }
         }
@@ -31,21 +36,19 @@ class GameFinishedValidator(private val array: List<MutableList<String>>) {
             val list = mutableListOf<String>()
             for (k in max(0, i - 9)..min(i, 9)) {
                 list.add(array[9 - k][i - k])
-                if (fiveInARow(list)) {
-                    return true
+                val res = fiveInARow(list)
+                if (res.finished) {
+                    return res
                 }
             }
         }
-//        todo diagonal
-//        for (i in 0..19) {
-//            if (fiveInARow(array.map { it[i] })) {
-//                return true
-//            }
-//        }
-        return false
+        if (!array.flatten().contains("")) {
+            return GameResult("", true)
+        }
+        return GameResult("", false)
     }
 
-    private fun fiveInARow(list: List<String>): Boolean {
+    private fun fiveInARow(list: List<String>): GameResult {
         var prev = ""
         var prevLength = 0
         list.forEach {
@@ -59,9 +62,9 @@ class GameFinishedValidator(private val array: List<MutableList<String>>) {
                 prevLength = 0
             }
             if (prevLength >= 5) {
-                return true
+                return GameResult(symbol2User[prev]?: "", true)
             }
         }
-        return false
+        return GameResult("", false)
     }
 }

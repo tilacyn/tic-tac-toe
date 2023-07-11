@@ -68,7 +68,7 @@ fun ChildrenBuilder.header(model: LobbyModel) {
 
     div {
         css {
-            display = Display.flex;
+            display = Display.flex
             justifyContent = JustifyContent.center
             alignItems = AlignItems.center
 

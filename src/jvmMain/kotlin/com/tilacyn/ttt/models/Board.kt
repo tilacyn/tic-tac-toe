@@ -22,14 +22,15 @@ class Board(
     var lastMoveTimestamp: Instant?,
     private val connections: MutableSet<Connection> = ConcurrentSet(),
     private var numericSymbolToAssign: AtomicInteger = AtomicInteger(1),
-    private var status: BoardStatus = BoardStatus.RUNNING
+    private var status: BoardStatus = BoardStatus.RUNNING,
+    private var winner: String = ""
 ) {
     fun toDTO(arrayRequired: Boolean): BoardDTO {
         val arrayPayload = when (arrayRequired) {
             true -> array
             else -> null
         }
-        return BoardDTO(id, arrayPayload, lastMove, user2Symbol, lastMoveTimestamp?.toString(), status)
+        return BoardDTO(id, arrayPayload, lastMove, user2Symbol, lastMoveTimestamp?.toString(), status, winner)
     }
 
     fun getStatus(): BoardStatus {
@@ -47,8 +48,10 @@ class Board(
         lastMove = user
         lastMoveTimestamp = Instant.now()
 
-        if (validateGameFinished()) {
+        val gameResult = validateGameFinished()
+        if (gameResult.finished) {
             status = BoardStatus.FINISHED
+            winner = gameResult.winner
         }
         return validationResult
     }
@@ -90,8 +93,8 @@ class Board(
     }
 
 
-    private fun validateGameFinished(): Boolean {
-        return GameFinishedValidator(array).run()
+    private fun validateGameFinished(): GameResult {
+        return GameFinishedValidator(array, user2Symbol.entries.associateBy({ it.value }) { it.key }).run()
     }
 
     private fun validateMove(m: Move, user: String): ValidationResult {
@@ -117,6 +120,10 @@ class Board(
 
     fun getNumericSymbolToAssign(): Int {
         return numericSymbolToAssign.get()
+    }
+
+    fun getWinner(): String {
+        return winner
     }
 }
 

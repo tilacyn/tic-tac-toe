@@ -1,6 +1,7 @@
 package com.tilacyn.ttt.models
 
 import com.tilacyn.ttt.store.BoardStore
+import com.tilacyn.ttt.store.randomString10
 import dto.BoardStatus
 import dto.Move
 import kotlinx.coroutines.runBlocking
@@ -30,34 +31,51 @@ internal class BoardTest {
     }
 
     @Test
+    fun gameIsDraw() {
+        val store = BoardStore()
+        runBlocking {
+            val b = store.addEmptyBoard("hermione")
+            for (i in 0..9) {
+                for (j in 0..9) {
+                    assertTrue(b.move(Move(i, j), randomString10()).result)
+                    if (i != 9 || j != 9) {
+                        assertEquals(BoardStatus.RUNNING, b.getStatus())
+                    } else {
+                        assertEquals(BoardStatus.FINISHED, b.getStatus())
+                        assertEquals("", b.getWinner())
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun fiveInARowHorizontal() {
-        twoPlayerMovesOk(
+        twoPlayerMovesFirstWins(
             List(5) {
                 Move(0, it)
             },
             List(4) {
                 Move(it + 1, 0)
-            },
-            BoardStatus.FINISHED
+            }
         )
     }
 
 
     @Test
     fun fiveInARowVertical() {
-        twoPlayerMovesOk(
+        twoPlayerMovesFirstWins(
             List(5) {
                 Move(2+ it, 4)
             },
             List(4) {
                 Move(it + 1, 0)
             },
-            BoardStatus.FINISHED
         )
     }
 
 
-    private fun twoPlayerMovesOk(firstPlayerMoves: List<Move>, secondPlayerMoves: List<Move>, status: BoardStatus) = runBlocking {
+    private fun twoPlayerMovesFirstWins(firstPlayerMoves: List<Move>, secondPlayerMoves: List<Move>) = runBlocking {
         val store = BoardStore()
         val b = store.addEmptyBoard("hermione")
         for (i in firstPlayerMoves.indices) {
@@ -79,32 +97,31 @@ internal class BoardTest {
                 assertEquals(b.getStatus(), BoardStatus.RUNNING)
             }
         }
-        assertEquals(status, b.getStatus())
+        assertEquals(BoardStatus.FINISHED, b.getStatus())
+        assertEquals("hermione", b.getWinner())
     }
 
     @Test
     fun fiveInARowDiagonal1() {
-        twoPlayerMovesOk(
+        twoPlayerMovesFirstWins(
             List(5) {
                 Move(it + 2, it)
             },
             List(4) {
                 Move(it + 1, it)
             },
-            BoardStatus.FINISHED
         )
     }
 
     @Test
     fun fiveInARowDiagonal2() {
-        twoPlayerMovesOk(
+        twoPlayerMovesFirstWins(
             List(5) {
                 Move(5 - it, it)
             },
             List(4) {
                 Move(6 - it, it)
             },
-            BoardStatus.FINISHED
         )
     }
 

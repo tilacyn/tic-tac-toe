@@ -193,20 +193,23 @@ fun boxCss(color1: NamedColor = NamedColor.white, useHover: Boolean): Properties
 
 fun createPrompt(dto: BoardDTO): String {
     return when {
-        dto.status == BoardStatus.FINISHED -> {
-            "Game is Finished"
+        dto.status == BoardStatus.FINISHED && dto.winner == "" -> {
+            "Game is Finished. Nobody won."
+        }
+        dto.status == BoardStatus.FINISHED && dto.winner != "" -> {
+            "Game is Finished. Winner is ${dto.winner}!"
         }
 
         dto.lastMoveUserID == boardData.userID -> {
-            "Last move was yours. Wait for another player to make a move"
+            "Last move was yours. Wait for another player to make a move."
         }
 
         dto.user2Symbol.containsKey(boardData.userID) -> {
-            "You are playing \"${dto.user2Symbol[boardData.userID]}\". You can make a move"
+            "You are playing \"${dto.user2Symbol[boardData.userID]}\". You can make a move."
         }
 
         else -> {
-            "You can make a move"
+            "You can make a move."
         }
     }
 }

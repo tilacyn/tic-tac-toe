@@ -30,7 +30,7 @@ fun fetchLobbyModel(): Promise<LobbyModel> {
     }
 }
 
-class LobbySubscription(var setter: StateSetter<LobbyModel>? = null) {
+class LobbySubscription(private var setter: StateSetter<LobbyModel>? = null) {
     fun subscribe() {
         console.log("subscribing to board ws")
         val socket = WebSocket("ws://localhost:8080/ws/board")

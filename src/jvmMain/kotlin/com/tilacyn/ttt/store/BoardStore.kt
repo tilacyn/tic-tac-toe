@@ -7,7 +7,6 @@ import io.ktor.websocket.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json.Default.encodeToString
 import kotlinx.serialization.serializer
 import java.util.concurrent.ConcurrentHashMap
@@ -58,7 +57,7 @@ class BoardStore(
             List(10) { MutableList(10) { "" } },
             user2Symbol = ConcurrentHashMap(),
             lastMove = "",
-            lastMoveTimestamp = null
+            lastMoveTimestamp = null,
         )
         ret.assignNewUser(user)
         this[id] = ret
