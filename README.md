@@ -1,3 +1,7 @@
+## Run the application
+
+`./gradlew run`
+
 ## Features
 
 #### Game Logic
